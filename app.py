@@ -52,7 +52,7 @@ def random_mesafe(df_input):
 # Gemini Yapay Zeka Raporlama Fonksiyonu
 def gemini_yorumla(arac_sayisi, toplam_mesafe, tasarruf, trafik):
     try:
-        model = genai.GenerativeModel("models/gemini-1.5-flash")
+        model = genai.GenerativeModel("gemini-pro")
 
         prompt = f"""
         Sen bir lojistik ve rota optimizasyon uzmanısın. 
