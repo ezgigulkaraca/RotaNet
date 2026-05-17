@@ -12,12 +12,12 @@ import google.generativeai as genai
 # Google AI Studio'dan aldığınız AIzaSy... ile başlayan anahtarınızı 
 # sadece aşağıdaki çift tırnak işaretlerinin arasına yapıştırın:
 
-API_KEY = "BURAYA_GEMINI_API_KEYINIZI_YAZIN"
+API_KEY = "AIzaSyDUNxlbI32_-9rQPwl6_hDjHKHXlX30EcA"
 
 # ==========================================
 # API YAPILANDIRMA KONTROLÜ
 # ==========================================
-if API_KEY and API_KEY != "BURAYA_GEMINI_API_KEYINIZI_YAZIN":
+if API_KEY and API_KEY != "AIzaSyDUNxlbI32_-9rQPwl6_hDjHKHXlX30EcA":
     genai.configure(api_key=API_KEY)
 elif "API KEY" in st.secrets:
     genai.configure(api_key=st.secrets["API KEY"])
