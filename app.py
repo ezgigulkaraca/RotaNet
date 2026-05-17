@@ -4,19 +4,16 @@ import numpy as np
 import plotly.graph_objects as go
 import itertools
 import random
-import google.generativeai as genai
+import requests
+import json
 
 # =========================
-# GEMINI API
+# API KEY
 # =========================
 API_KEY = "AIzaSyAXA7edsGE5ggJrQo5wT2CO2pe2BSbEoKc"
 
-genai.configure(api_key=API_KEY)
-
-model = genai.GenerativeModel("gemini-1.5-flash-latest")
-
 # =========================
-# STREAMLIT
+# STREAMLIT AYAR
 # =========================
 st.set_page_config(page_title="LogiMind AI", layout="wide")
 
@@ -31,7 +28,7 @@ arac_kapasitesi = st.sidebar.slider("Araç Kapasitesi", 5, 50, 15)
 trafik = st.sidebar.slider("Trafik Katsayısı", 1.0, 2.0, 1.0)
 
 # =========================
-# MÜŞTERİ VERİLERİ
+# MÜŞTERİLER
 # =========================
 musteriler = {
     "A": (5, 10, 3),
@@ -46,7 +43,7 @@ musteriler = {
 }
 
 # =========================
-# MESAFE FONKSİYONU
+# MESAFE
 # =========================
 def mesafe(p1, p2):
     return np.hypot(p1[0] - p2[0], p1[1] - p2[1]) * trafik
@@ -58,32 +55,49 @@ def random_mesafe(df):
     return sum(mesafe(yol[i], yol[i + 1]) for i in range(len(yol) - 1))
 
 # =========================
-# GEMINI ANALİZ
+# GEMINI (REST API - ÇALIŞAN VERSİYON)
 # =========================
-def gemini_rapor(arac, mesafe_val, tasarruf, trafik_val):
+def gemini_yorum(arac_sayisi, toplam_mesafe, tasarruf, trafik):
     try:
         prompt = f"""
 Sen bir lojistik optimizasyon uzmanısın.
 
-Araç sayısı: {arac}
-Toplam mesafe: {mesafe_val:.2f}
-Tasarruf oranı: %{tasarruf:.1f}
-Trafik katsayısı: {trafik_val}
+Araç sayısı: {arac_sayisi}
+Toplam mesafe: {toplam_mesafe:.2f}
+Tasarruf: %{tasarruf:.1f}
+Trafik: {trafik}
 
-3 madde halinde analiz yap:
-1. Verimlilik değerlendirmesi
-2. Operasyonel öneri
+3 maddede analiz yap:
+1. Verimlilik
+2. Operasyon önerisi
 3. Maliyet ve çevresel etki
 """
 
-        response = model.generate_content(prompt)
-        return response.text
+        url = f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={API_KEY}"
+
+        payload = {
+            "contents": [
+                {
+                    "parts": [
+                        {"text": prompt}
+                    ]
+                }
+            ]
+        }
+
+        response = requests.post(url, json=payload)
+        result = response.json()
+
+        if "error" in result:
+            return result["error"]["message"]
+
+        return result["candidates"][0]["content"]["parts"][0]["text"]
 
     except Exception as e:
-        return f"Hata: {e}"
+        return f"Hata: {str(e)}"
 
 # =========================
-# MÜŞTERİ SEÇİMİ
+# SEÇİM
 # =========================
 secili = st.multiselect(
     "Müşteriler",
@@ -126,7 +140,6 @@ if st.button("Optimize Et"):
 
         for a in range(arac_sayisi):
             if yuk[a] + m["demand"] <= arac_kapasitesi:
-
                 last = (0, 0) if not rotalar[a] else (rotalar[a][-1]["x"], rotalar[a][-1]["y"])
                 d = mesafe(last, (m["x"], m["y"]))
 
@@ -191,5 +204,5 @@ if st.button("Optimize Et"):
     st.subheader("AI Analiz")
 
     with st.spinner("Gemini çalışıyor"):
-        sonuc = gemini_rapor(arac_sayisi, toplam_mesafe, tasarruf, trafik)
+        sonuc = gemini_yorum(arac_sayisi, toplam_mesafe, tasarruf, trafik)
         st.write(sonuc)
