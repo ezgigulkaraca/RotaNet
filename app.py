@@ -7,27 +7,25 @@ import random
 import google.generativeai as genai
 
 # =========================
-# GEMINI API SETUP
+# GEMINI API
 # =========================
 API_KEY = "AIzaSyAXA7edsGE5ggJrQo5wT2CO2pe2BSbEoKc"
 
 genai.configure(api_key=API_KEY)
 
-model = genai.GenerativeModel("gemini-1.5-flash")
+model = genai.GenerativeModel("gemini-1.5-flash-latest")
 
 # =========================
-# STREAMLIT AYAR
+# STREAMLIT
 # =========================
-st.set_page_config(page_title="LogiMind", layout="wide")
+st.set_page_config(page_title="LogiMind AI", layout="wide")
 
-st.title("🚚 LogiMind: Rota Optimizasyon Sistemi")
-st.write("BTK Hackathon 2026 - AI destekli lojistik optimizasyon")
+st.title("LogiMind - Rota Optimizasyon Sistemi")
+st.write("AI destekli lojistik optimizasyon")
 
 # =========================
-# SIDEBAR PARAMETRELER
+# PARAMETRELER
 # =========================
-st.sidebar.header("Parametreler")
-
 arac_sayisi = st.sidebar.slider("Araç Sayısı", 1, 5, 2)
 arac_kapasitesi = st.sidebar.slider("Araç Kapasitesi", 5, 50, 15)
 trafik = st.sidebar.slider("Trafik Katsayısı", 1.0, 2.0, 1.0)
@@ -48,7 +46,7 @@ musteriler = {
 }
 
 # =========================
-# MESAFE
+# MESAFE FONKSİYONU
 # =========================
 def mesafe(p1, p2):
     return np.hypot(p1[0] - p2[0], p1[1] - p2[1]) * trafik
@@ -56,47 +54,44 @@ def mesafe(p1, p2):
 def random_mesafe(df):
     noktalar = df.iloc[1:].to_dict("records")
     random.shuffle(noktalar)
-    yol = [(0,0)] + [(n["x"], n["y"]) for n in noktalar] + [(0,0)]
-    return sum(mesafe(yol[i], yol[i+1]) for i in range(len(yol)-1))
+    yol = [(0, 0)] + [(n["x"], n["y"]) for n in noktalar] + [(0, 0)]
+    return sum(mesafe(yol[i], yol[i + 1]) for i in range(len(yol) - 1))
 
 # =========================
-# GEMINI AI
+# GEMINI ANALİZ
 # =========================
-def gemini_yorum(arac, mesafe, tasarruf, trafik):
+def gemini_rapor(arac, mesafe_val, tasarruf, trafik_val):
     try:
         prompt = f"""
 Sen bir lojistik optimizasyon uzmanısın.
 
 Araç sayısı: {arac}
-Toplam mesafe: {mesafe:.2f}
-Tasarruf: %{tasarruf:.1f}
-Trafik: {trafik}
+Toplam mesafe: {mesafe_val:.2f}
+Tasarruf oranı: %{tasarruf:.1f}
+Trafik katsayısı: {trafik_val}
 
-3 madde yaz:
-- Verimlilik analizi
-- Operasyon önerisi
-- Karbon + maliyet etkisi
+3 madde halinde analiz yap:
+1. Verimlilik değerlendirmesi
+2. Operasyonel öneri
+3. Maliyet ve çevresel etki
 """
 
         response = model.generate_content(prompt)
         return response.text
 
     except Exception as e:
-        return f"AI Hatası: {e}"
+        return f"Hata: {e}"
 
 # =========================
 # MÜŞTERİ SEÇİMİ
 # =========================
-st.subheader("Müşteri Seçimi")
-
 secili = st.multiselect(
-    "Müşteriler:",
+    "Müşteriler",
     list(musteriler.keys()),
-    default=["A","B","C","D","E"]
+    default=["A", "B", "C", "D", "E"]
 )
 
 if len(secili) == 0:
-    st.warning("En az 1 müşteri seçmelisin")
     st.stop()
 
 # =========================
@@ -114,13 +109,13 @@ st.dataframe(df)
 # =========================
 # OPTİMİZASYON
 # =========================
-if st.button("Optimize Et 🚀"):
+if st.button("Optimize Et"):
 
     toplam_talep = df["demand"].sum()
     kapasite = arac_sayisi * arac_kapasitesi
 
     if toplam_talep > kapasite:
-        st.error("Kapasite yetersiz!")
+        st.error("Kapasite yetersiz")
         st.stop()
 
     rotalar = {i: [] for i in range(arac_sayisi)}
@@ -131,28 +126,19 @@ if st.button("Optimize Et 🚀"):
 
         for a in range(arac_sayisi):
             if yuk[a] + m["demand"] <= arac_kapasitesi:
-                if len(rotalar[a]) == 0:
-                    last = (0,0)
-                else:
-                    last = (rotalar[a][-1]["x"], rotalar[a][-1]["y"])
 
+                last = (0, 0) if not rotalar[a] else (rotalar[a][-1]["x"], rotalar[a][-1]["y"])
                 d = mesafe(last, (m["x"], m["y"]))
+
                 if best is None or d < best[0]:
                     best = (d, a)
 
-        if best:
-            a = best[1]
-        else:
-            a = min(yuk, key=yuk.get)
-
+        a = best[1] if best else 0
         rotalar[a].append(m)
         yuk[a] += m["demand"]
 
-    # =========================
-    # ROUTE + PLOT
-    # =========================
     fig = go.Figure()
-    renk = ["red","blue","green","purple","orange"]
+    renkler = ["red", "blue", "green", "purple", "orange"]
 
     toplam_mesafe = 0
 
@@ -165,8 +151,8 @@ if st.button("Optimize Et 🚀"):
         best_cost = float("inf")
 
         for perm in itertools.permutations(rotalar[a]):
-            path = [(0,0)] + [(p["x"], p["y"]) for p in perm] + [(0,0)]
-            cost = sum(mesafe(path[i], path[i+1]) for i in range(len(path)-1))
+            path = [(0, 0)] + [(p["x"], p["y"]) for p in perm] + [(0, 0)]
+            cost = sum(mesafe(path[i], path[i + 1]) for i in range(len(path) - 1))
 
             if cost < best_cost:
                 best_cost = cost
@@ -181,36 +167,29 @@ if st.button("Optimize Et 🚀"):
             x=x,
             y=y,
             mode="lines+markers",
-            name=f"Araç {a+1}",
-            line=dict(color=renk[a % len(renk)], width=3)
+            name=f"Araç {a + 1}",
+            line=dict(color=renkler[a % len(renkler)], width=3)
         ))
 
     fig.add_trace(go.Scatter(
-        x=[0], y=[0],
+        x=[0],
+        y=[0],
         mode="markers",
         name="Depo",
         marker=dict(size=12, color="black", symbol="square")
     ))
 
-    fig.update_layout(title="Rota Haritası")
-
-    # =========================
-    # METRİKLER
-    # =========================
     r = random_mesafe(df)
     tasarruf = ((r - toplam_mesafe) / r) * 100 if r else 0
 
-    st.metric("Rastgele", f"{r:.2f}")
-    st.metric("Optimize", f"{toplam_mesafe:.2f}")
+    st.metric("Rastgele Rota", f"{r:.2f}")
+    st.metric("Optimize Rota", f"{toplam_mesafe:.2f}")
     st.metric("Tasarruf", f"%{tasarruf:.1f}")
 
     st.plotly_chart(fig, use_container_width=True)
 
-    # =========================
-    # GEMINI OUTPUT
-    # =========================
-    st.subheader("AI Rapor")
+    st.subheader("AI Analiz")
 
-    with st.spinner("Gemini çalışıyor..."):
-        result = gemini_yorum(arac_sayisi, toplam_mesafe, tasarruf, trafik)
-        st.success(result)
+    with st.spinner("Gemini çalışıyor"):
+        sonuc = gemini_rapor(arac_sayisi, toplam_mesafe, tasarruf, trafik)
+        st.write(sonuc)
