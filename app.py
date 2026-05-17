@@ -10,7 +10,7 @@ from google import genai
 # =========================
 # GEMINI CLIENT
 # =========================
-client = genai.Client(api_key="AIzaSyCAZMZqB5SIaSK4IK-a_dzAyVXQzYag5HU")
+client = genai.Client(api_key="AIzaSyD0L3JDBUenJZgts_ydzFySveQBcqacqdE")
 
 # =========================
 # SAYFA AYARLARI
