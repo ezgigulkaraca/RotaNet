@@ -9,18 +9,15 @@ import google.generativeai as genai
 # ==========================================
 # GEMINI API AYARI
 # ==========================================
-# Google AI Studio'dan aldığınız AIzaSy... ile başlayan anahtarınızı 
-# sadece aşağıdaki çift tırnak işaretlerinin arasına yapıştırın:
+# Google AI Studio'dan aldiginiz anahtar dogrudan entegre edilmistir:
 
 API_KEY = "AIzaSyDUNxlbI32_-9rQPwl6_hDjHKHXlX30EcA"
 
 # ==========================================
 # API YAPILANDIRMA KONTROLÜ
 # ==========================================
-if API_KEY and API_KEY != "AIzaSyDUNxlbI32_-9rQPwl6_hDjHKHXlX30EcA":
+if API_KEY:
     genai.configure(api_key=API_KEY)
-elif "API KEY" in st.secrets:
-    genai.configure(api_key=st.secrets["API KEY"])
 else:
     st.warning("Gemini API Key henüz tanımlanmadı. AI Degerlendirme modu calismayacaktir.")
 
@@ -190,16 +187,4 @@ if st.button("Rota ve Yuk Dagitimini Optimize Et"):
     r_mesafe = random_mesafe(df)
     tasarruf = ((r_mesafe - toplam_mesafe) / r_mesafe) * 100 if r_mesafe > 0 else 0
 
-    col1, col2, col3 = st.columns(3)
-    col1.metric("Geleneksel (Rastgele Rota)", f"{r_mesafe:.2f} km")
-    col2.metric("LogiMind (Optimize Rota)", f"{toplam_mesafe:.2f} km")
-    col3.metric("Saglanan Karbon/Yol Tasarrufu", f"%{tasarruf:.1f}")
-
-    # Haritayi Goster
-    st.plotly_chart(fig, use_container_width=True)
-
-    # AI Yorum Alani
-    st.subheader("LogiMind Yapay Zeka Degerlendirmesi")
-    with st.spinner("Gemini rapor hazirliyor..."):
-        ai_raporu = gemini_yorumla(arac_sayisi, toplam_mesafe, tasarruf, trafik)
-        st.info(ai_raporu)
+    col1, col
