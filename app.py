@@ -69,7 +69,7 @@ def gemini_yorumla(arac_sayisi, toplam_mesafe, tasarruf, trafik):
         - Bu optimizasyonun karbon salinimi (yesil lojistik) ve sirket maliyetlerine etkisi
         """
         
-        # Kararli ana sürüm olan v1 endpoint'ini ve doğrudan model adını kullanıyoruz
+        # v1 endpoint'i için model adının başındaki "models/" kısmını tamamen sildik
         url = f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={API_KEY}"
         headers = {'Content-Type': 'application/json'}
         payload = {"contents": [{"parts": [{"text": prompt}]}]}
