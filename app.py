@@ -8,29 +8,41 @@ import random
 from google import genai
 
 # =========================
-# GEMINI CLIENT
+# SAYFA
 # =========================
-client = genai.Client(api_key="A")
+st.set_page_config(page_title="LogiMind AI", layout="wide")
+
+st.title("LogiMind AI Rota Optimizasyonu")
+st.write("Kullanıcı kendi Gemini API key’i ile sistemi test edebilir.")
 
 # =========================
-# SAYFA AYARLARI
+# API KEY GİRİŞİ
 # =========================
-st.set_page_config(page_title="LogiMind", layout="wide")
+st.sidebar.header("Gemini API Ayarları")
 
-st.title("LogiMind: Rota ve Yük Optimizasyonu")
-st.write("BTK Hackathon - AI destekli lojistik optimizasyon sistemi")
+api_key = st.sidebar.text_input(
+    "Gemini API Key Girin",
+    type="password"
+)
+
+client = None
+
+if api_key:
+    try:
+        client = genai.Client(api_key=api_key)
+        st.sidebar.success("API Key yüklendi ✔")
+    except:
+        st.sidebar.error("API Key geçersiz ❌")
 
 # =========================
-# SIDEBAR
+# PARAMETRELER
 # =========================
-st.sidebar.header("Parametreler")
-
 arac_sayisi = st.sidebar.slider("Araç Sayısı", 1, 5, 2)
 arac_kapasitesi = st.sidebar.slider("Araç Kapasitesi", 5, 50, 15)
 trafik = st.sidebar.slider("Trafik Katsayısı", 1.0, 2.0, 1.0)
 
 # =========================
-# MÜŞTERİ VERİLERİ
+# MÜŞTERİLER
 # =========================
 musteriler = {
     "A": (5, 10, 3), "B": (-3, 8, 5), "C": (12, 2, 4),
@@ -39,7 +51,7 @@ musteriler = {
 }
 
 # =========================
-# MESAFE FONKSİYONU
+# MESAFE
 # =========================
 def mesafe(p1, p2):
     return np.hypot(p1[0] - p2[0], p1[1] - p2[1]) * trafik
@@ -59,52 +71,51 @@ def random_mesafe(df):
     )
 
 # =========================
-# GEMINI ANALİZ FONKSİYONU
+# GEMINI ANALİZ
 # =========================
-def gemini_yorumla(arac_sayisi, toplam_mesafe, tasarruf, trafik):
+def gemini_yorumla(client, arac_sayisi, toplam_mesafe, tasarruf, trafik):
+    if client is None:
+        return "Gemini aktif değil (API key girilmedi)"
+
     try:
         prompt = f"""
-Sen bir lojistik optimizasyon uzmanısın.
+Lojistik uzmanısın.
 
-Veriler:
-- Araç sayısı: {arac_sayisi}
-- Optimize mesafe: {toplam_mesafe:.2f} km
-- Tasarruf: %{tasarruf:.1f}
-- Trafik: {trafik}
+Araç: {arac_sayisi}
+Mesafe: {toplam_mesafe:.2f}
+Tasarruf: %{tasarruf:.1f}
+Trafik: {trafik}
 
-3 maddede analiz yap:
-1. Verimlilik değerlendirmesi
-2. Operasyonel öneri
-3. Maliyet ve karbon etkisi
+3 madde analiz yap:
+- verimlilik
+- operasyon önerisi
+- karbon/maliyet etkisi
 """
 
         response = client.models.generate_content(
-            model="gemini-2.0-flash",
+            model="gemini-1.5-flash",
             contents=prompt
         )
 
         return response.text
 
     except Exception as e:
-        return f"Gemini hata verdi: {e}"
+        return f"Gemini hata: {e}"
 
 # =========================
-# UI - MÜŞTERİ SEÇİMİ
+# UI
 # =========================
-st.subheader("Müşteri Seçimi")
-
 secili = st.multiselect(
-    "Müşteriler:",
+    "Müşteriler",
     list(musteriler.keys()),
-    default=["A", "B", "C", "D"]
+    default=["A", "B", "C"]
 )
 
 if len(secili) == 0:
-    st.warning("En az 1 müşteri seç")
     st.stop()
 
 # =========================
-# DATAFRAME
+# DATA
 # =========================
 data = [{"name": "Depo", "x": 0, "y": 0, "demand": 0}]
 
@@ -121,6 +132,7 @@ st.dataframe(df)
 if st.button("Optimize Et"):
 
     toplam_talep = df["demand"].sum()
+
     if toplam_talep > arac_sayisi * arac_kapasitesi:
         st.error("Kapasite yetersiz!")
         st.stop()
@@ -128,7 +140,6 @@ if st.button("Optimize Et"):
     rotalar = {i: [] for i in range(arac_sayisi)}
     yuk = {i: 0 for i in range(arac_sayisi)}
 
-    # dağıtım
     for m in data[1:]:
         best = None
 
@@ -149,7 +160,7 @@ if st.button("Optimize Et"):
         yuk[a] += m["demand"]
 
     fig = go.Figure()
-    renkler = ["red", "blue", "green", "purple", "orange"]
+    colors = ["red", "blue", "green", "purple", "orange"]
 
     toplam_mesafe = 0
 
@@ -182,7 +193,7 @@ if st.button("Optimize Et"):
             y=y,
             mode="lines+markers",
             name=f"Araç {a+1}",
-            line=dict(color=renkler[a % len(renkler)], width=3)
+            line=dict(color=colors[a % len(colors)], width=3)
         ))
 
     fig.add_trace(go.Scatter(
@@ -201,15 +212,15 @@ if st.button("Optimize Et"):
     tasarruf = ((r - toplam_mesafe) / r) * 100 if r > 0 else 0
 
     col1, col2, col3 = st.columns(3)
-    col1.metric("Random", f"{r:.2f} km")
-    col2.metric("Optimize", f"{toplam_mesafe:.2f} km")
+    col1.metric("Random", f"{r:.2f}")
+    col2.metric("Optimize", f"{toplam_mesafe:.2f}")
     col3.metric("Tasarruf", f"%{tasarruf:.1f}")
 
     # =========================
-    # GEMINI RAPOR
+    # AI RAPOR
     # =========================
     st.subheader("AI Analiz")
 
-    with st.spinner("Gemini yazıyor..."):
-        rapor = gemini_yorumla(arac_sayisi, toplam_mesafe, tasarruf, trafik)
+    with st.spinner("Gemini çalışıyor..."):
+        rapor = gemini_yorumla(client, arac_sayisi, toplam_mesafe, tasarruf, trafik)
         st.info(rapor)
