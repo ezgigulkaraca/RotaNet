@@ -1,38 +1,140 @@
-# LogiMind: Akıllı Rota ve Yük Optimizasyon Platformu
+<div align="center">
 
-### BTK Akademi Hackathon 2026 Proje Başvurusu
+# RotaNet
 
-## Projenin Amacı ve Çözdüğü Problem
-LogiMind, lojistik operasyonlarında KOBİ'lerin ve taşımacılık firmalarının karşılaştığı en büyük problemlerden biri olan verimsiz rota planlaması, boş kilometre maliyetleri ve yüksek karbon salınımı sorunlarına yenilikçi bir çözüm sunar. 
+### Optimize Routes. Empower Decisions.
 
-Geleneksel yöntemlerle yapılan manuel planlamalar hem zaman kaybına yol açmakta hem de araç kapasitelerinin tam olarak kullanılamamasına neden olmaktadır. LogiMind; dağıtım merkezlerinden çıkan araçların minimum mesafe ve maksimum yük verimliliğiyle hareket etmesini sağlayan, yapay zeka ve matematiksel modelleme tabanlı bir karar destek sistemidir.
+AI-Powered Logistics Decision Support Platform
 
-## Kullanılan Teknolojiler ve Mimari
-Proje, tamamen bulut tabanlı ve ölçeklenebilir bileşenler üzerine inşa edilmiştir:
-* Yapay Zeka ve Optimizasyon Motoru: Google OR-Tools (Kapasiteli Araç Rotalama Problemi - CVRP Çözücüsü)
-* Kullanıcı Arayüzü: Streamlit (Kurumsal Veri Paneli)
-* Veri Analitiği ve Matris Modelleme: NumPy ve Pandas
-* Görselleştirme ve Grafik: Plotly (İnteraktif Rota ve Koordinat Analiz Haritası)
-* Yapay Zeka Entegrasyon Altyapısı: Projenin karar mekanizmalarında ve veri anlamlandırma süreçlerinde Üretken Yapay Zeka (Gemini API) entegrasyonuna uygun mimari altyapı hazırlanmıştır.
+</div>
 
-## Projenin Sağladığı Katma Değer (Jüri Metrikleri)
-Sistem simüle edilen dağıtım verileri üzerinde çalıştırıldığında anlık olarak şu analitik çıktıları üretmektedir:
-1. Geleneksel Yöntem ve Optimize Rota Karşılaştırması: Kat edilen toplam mesafede bariz azalma.
-2. Verimlilik ve Maliyet Tasarrufu: Yakıt, amortisman ve operasyonel zaman maliyetlerinde doğrudan düşüş analizi.
-3. Sürdürülebilirlik (Yeşil Lojistik): Azaltılan kilometre başına karbon (CO2) salınımının hesaplanması ve doğaya katkı raporlaması.
+---
 
-## Sistemi Yerelde Çalıştırma (Kurulum)
-Proje Streamlit Cloud üzerinde canlıda test edilebilir durumdadır. Yerel bilgisayarda çalıştırmak istenmesi durumunda aşağıdaki adımlar takip edilmelidir:
+## Overview
 
-```bash
-# 1. Depoyu bilgisayarınıza indirin
-git clone [https://github.com/ezgigulkaraca/LogiMind-AI-Route-Optimization.git](https://github.com/ezgigulkaraca/LogiMind-AI-Route-Optimization.git)
+RotaNet is an AI-powered logistics decision support platform that helps organizations optimize transportation operations through mathematical optimization, data analytics and artificial intelligence.
 
-# 2. Proje klasörüne girin
-cd LogiMind-AI-Route-Optimization
+Unlike conventional route planning tools, RotaNet not only generates optimized routes but also provides decision support by explaining why a particular solution is recommended and by comparing alternative operational scenarios.
 
-# 3. Gerekli kütüphaneleri yükleyin
-pip install -r requirements.txt
+The platform is designed to improve logistics efficiency, reduce operational costs and support more sustainable transportation planning.
 
-# 4. Uygulamayı başlatın
-streamlit run app.py
+---
+
+## Key Features
+
+- Route Optimization
+- Vehicle Capacity Optimization
+- Interactive Route Visualization
+- Operational Dashboard
+- AI-Powered Decision Explanations
+- CO₂ Emission Analysis
+- Scenario Comparison
+- Logistics Performance Analytics
+
+---
+
+## Technology Stack
+
+| Category | Technology |
+|----------|------------|
+| Programming Language | Python |
+| Optimization Engine | Google OR-Tools |
+| Data Processing | Pandas, NumPy |
+| User Interface | Streamlit |
+| Data Visualization | Plotly |
+| Artificial Intelligence | Google Gemini API *(planned)* |
+| Mapping | Folium / OpenStreetMap *(planned)* |
+
+---
+
+## Project Structure
+
+```text
+RotaNet
+│
+├── ai/
+├── assets/
+├── backend/
+├── datasets/
+├── docs/
+├── frontend/
+├── README.md
+├── requirements.txt
+└── LICENSE
+```
+
+---
+
+## Objectives
+
+The primary objectives of RotaNet are:
+
+- Optimize transportation routes
+- Increase vehicle utilization
+- Reduce operational costs
+- Support data-driven decision making
+- Reduce carbon emissions
+- Improve logistics efficiency
+
+---
+
+## Development Roadmap
+
+### Phase 1
+
+- Product Vision
+- Repository Structure
+- Project Documentation
+- Technical Architecture
+
+### Phase 2
+
+- Route Optimization Engine
+- Dashboard Development
+- Interactive Map Integration
+- CO₂ Emission Analysis
+
+### Phase 3
+
+- AI Decision Support
+- Scenario Analysis
+- Operational Performance Metrics
+
+### Phase 4
+
+- Public MVP Release
+- Web Platform
+- User Authentication
+- Cloud Deployment
+
+---
+
+## Documentation
+
+Project documentation is available in the `docs` directory.
+
+- Product Vision
+- Technical Architecture
+- Development Roadmap
+
+---
+
+## Project Status
+
+RotaNet is currently under active development.
+
+The initial release focuses on delivering a functional Minimum Viable Product (MVP) that demonstrates the core capabilities of the platform.
+
+---
+
+## Author
+
+**Ezgigül Karaca**
+
+Industrial Engineering Student
+
+---
+
+## License
+
+This project is licensed under the MIT License.
