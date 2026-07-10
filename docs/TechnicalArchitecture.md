@@ -1,10 +1,10 @@
 # Technical Architecture
 
-## Overview
+## System Overview
 
-RotaNet is designed as a modular AI-powered logistics decision support platform. The system processes logistics data, optimizes delivery routes, analyzes operational performance and generates AI-assisted recommendations.
+RotaNet is designed as a modular AI-powered logistics decision support platform.
 
-The architecture is designed to support future scalability while keeping the first MVP simple and maintainable.
+The system consists of independent modules responsible for data processing, optimization, visualization and artificial intelligence. This architecture allows each component to be developed and maintained separately while keeping the platform scalable.
 
 ---
 
@@ -16,77 +16,137 @@ The architecture is designed to support future scalability while keeping the fir
                   ▼
         Streamlit Web Interface
                   │
+        ┌─────────┼─────────┐
+        ▼         ▼         ▼
+ Dataset Loader  Optimization  AI Engine
+                  Engine
+        │         │         │
+        └─────────┼─────────┘
                   ▼
-        Data Upload (CSV / Excel)
+          Analytics Dashboard
                   │
                   ▼
-         Data Validation Layer
-                  │
-                  ▼
-        Route Optimization Engine
-           (Google OR-Tools)
-                  │
-         ┌────────┴────────┐
-         ▼                 ▼
- Route Results      Performance Metrics
-         │                 │
-         └────────┬────────┘
-                  ▼
-          AI Recommendation Engine
-             (Google Gemini)
-                  │
-                  ▼
-          Dashboard & Reports
+             Maps & Reports
 ```
 
 ---
 
-## Technology Stack
+## Frontend
 
-| Layer | Technology |
-|--------|------------|
-| Frontend | Streamlit |
-| Backend | Python |
-| Optimization | Google OR-Tools |
-| Data Processing | Pandas |
-| Numerical Computing | NumPy |
-| Visualization | Plotly |
-| Artificial Intelligence | Google Gemini API |
-| Mapping | Folium *(planned)* |
+The frontend is built with Streamlit.
 
----
+Responsibilities:
 
-## Data Flow
-
-1. User uploads logistics data.
-2. Data is validated and processed.
-3. OR-Tools calculates optimized routes.
-4. Performance metrics are generated.
-5. Gemini analyzes the optimization results.
-6. Dashboard displays maps, KPIs and AI recommendations.
+- User interface
+- Dataset upload
+- Parameter selection
+- Dashboard visualization
+- Route visualization
+- KPI presentation
 
 ---
 
-## MVP Scope
+## Backend
 
-The first version of RotaNet will include:
+The backend handles business logic and optimization.
 
-- CSV upload
+Responsibilities:
+
+- Data processing
 - Route optimization
-- Vehicle capacity optimization
-- Interactive dashboard
-- KPI calculations
-- AI-generated operational recommendations
+- Distance calculation
+- Fleet utilization analysis
+- Cost estimation
 
 ---
 
-## Future Improvements
+## Artificial Intelligence Module
 
-- Live traffic integration
-- Real-time vehicle tracking
-- Multi-depot optimization
-- Demand forecasting
-- ERP integration
-- User authentication
-- Cloud deployment
+The AI module is responsible for generating operational insights.
 
+Planned capabilities:
+
+- Route explanation
+- Decision support
+- Alternative scenario recommendations
+- Risk analysis
+- Operational summaries
+
+Technology:
+
+- Google Gemini API
+
+---
+
+## Optimization Engine
+
+The optimization engine is based on Google OR-Tools.
+
+Optimization objectives:
+
+- Minimize total distance
+- Increase vehicle utilization
+- Reduce transportation costs
+- Improve operational efficiency
+
+---
+
+## Data Layer
+
+Supported formats:
+
+- CSV
+- Excel (.xlsx)
+
+Future support:
+
+- SQL Database
+- REST API
+- ERP Integration
+
+---
+
+## Visualization
+
+Visualization technologies:
+
+- Plotly
+- Folium
+- OpenStreetMap
+
+Displayed information:
+
+- Routes
+- Vehicle locations
+- KPIs
+- Operational metrics
+
+---
+
+## Project Structure
+
+```
+RotaNet/
+│
+├── ai/
+├── assets/
+├── backend/
+├── datasets/
+├── docs/
+├── frontend/
+├── README.md
+├── requirements.txt
+└── LICENSE
+```
+
+---
+
+## Future Integrations
+
+- Google Maps API
+- Traffic Data
+- Weather Services
+- ERP Systems
+- Fleet Management Systems
+- Cloud Deployment
+- 
