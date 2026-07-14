@@ -1,8 +1,6 @@
 import pandas as pd
-from pathlib import Path
 
 
-# RotaNet'in ihtiyaç duyduğu zorunlu sütunlar
 REQUIRED_COLUMNS = [
     "delivery_id",
     "latitude",
@@ -11,34 +9,37 @@ REQUIRED_COLUMNS = [
 ]
 
 
-def load_dataset(file_path: str) -> pd.DataFrame:
+def load_dataset(uploaded_file) -> pd.DataFrame:
     """
-    CSV veya Excel dosyasını yükler ve doğrular.
+    Load and validate a CSV or Excel dataset uploaded
+    through Streamlit.
 
     Parameters
     ----------
-    file_path : str
-        Yüklenecek dosyanın yolu.
+    uploaded_file
+        Streamlit UploadedFile object.
 
     Returns
     -------
     pd.DataFrame
-        Temizlenmiş veri seti.
+        Validated dataset.
     """
 
-    file_path = Path(file_path)
+    file_name = uploaded_file.name.lower()
 
-    if not file_path.exists():
-        raise FileNotFoundError(f"Dosya bulunamadı: {file_path}")
+    if file_name.endswith(".csv"):
 
-    if file_path.suffix.lower() == ".csv":
-        df = pd.read_csv(file_path)
+        df = pd.read_csv(uploaded_file)
 
-    elif file_path.suffix.lower() in [".xlsx", ".xls"]:
-        df = pd.read_excel(file_path)
+    elif file_name.endswith((".xlsx", ".xls")):
+
+        df = pd.read_excel(uploaded_file)
 
     else:
-        raise ValueError("Desteklenmeyen dosya formatı. CSV veya Excel kullanın.")
+
+        raise ValueError(
+            "Unsupported file format. Please upload a CSV or Excel file."
+        )
 
     missing_columns = [
         column
@@ -47,8 +48,9 @@ def load_dataset(file_path: str) -> pd.DataFrame:
     ]
 
     if missing_columns:
+
         raise ValueError(
-            f"Eksik sütunlar bulundu: {missing_columns}"
+            f"Missing required columns: {', '.join(missing_columns)}"
         )
 
     df = df.dropna()
