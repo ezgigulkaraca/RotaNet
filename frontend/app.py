@@ -80,3 +80,20 @@ if st.session_state.optimization_completed:
     show_dashboard(st.session_state.metrics)
     show_charts(st.session_state.dataset, st.session_state.route)
     show_route_map(st.session_state.dataset, st.session_state.route)
+# Sonuçları göster (Eğer optimizasyon yapıldıysa)
+if st.session_state.optimization_completed:
+    # 1. Dashboard ve Grafikleri göster
+    show_dashboard(st.session_state.metrics)
+    show_charts(st.session_state.dataset, st.session_state.route)
+    
+    # 2. Haritayı göster
+    show_route_map(st.session_state.dataset, st.session_state.route)
+    
+    # 3. YENİ: AI Analizini en sona ekle
+    st.divider()
+    if st.button("Generate AI Logistics Report"):
+        with st.spinner("AI analyzing route..."):
+            # Bu fonksiyonu backend/ai_service.py içinden çağıracaksın
+            insights = get_route_insights(st.session_state.metrics, st.session_state.route)
+            st.success("AI Insight:")
+            st.write(insights)
