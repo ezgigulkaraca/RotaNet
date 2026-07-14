@@ -1,13 +1,20 @@
 from ortools.constraint_solver import pywrapcp, routing_enums_pb2
 
 
-def optimize_route(distance_matrix):
+def optimize_route(
+    distance_matrix,
+    vehicle_count: int = 1
+):
     """
-    Google OR-Tools kullanarak en kısa rotayı hesaplar.
+    Calculate the shortest delivery route using Google OR-Tools.
 
     Parameters
     ----------
     distance_matrix : numpy.ndarray
+        Distance matrix between delivery locations.
+
+    vehicle_count : int, optional
+        Number of available vehicles.
 
     Returns
     -------
@@ -19,8 +26,8 @@ def optimize_route(distance_matrix):
 
     manager = pywrapcp.RoutingIndexManager(
         len(distance_matrix),
-        1,      # Araç sayısı
-        0       # Depo (başlangıç)
+        vehicle_count,
+        0
     )
 
     routing = pywrapcp.RoutingModel(manager)
@@ -49,7 +56,7 @@ def optimize_route(distance_matrix):
     solution = routing.SolveWithParameters(search_parameters)
 
     if solution is None:
-        raise RuntimeError("Optimum rota bulunamadı.")
+        raise RuntimeError("No feasible route could be found.")
 
     index = routing.Start(0)
 
@@ -77,6 +84,6 @@ def optimize_route(distance_matrix):
 
     route.append(manager.IndexToNode(index))
 
-    total_distance = total_distance / 1000
+    total_distance /= 1000
 
     return route, total_distance
