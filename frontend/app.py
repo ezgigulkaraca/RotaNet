@@ -1,4 +1,30 @@
 import streamlit as st
+
+# Sayfa ayarları
+st.set_page_config(page_title="RotaNet - Logistics Optimization", layout="wide")
+
+# Logo ve Başlık
+col1, col2 = st.columns([1, 4])
+with col1:
+    # Eğer assets klasöründe logo.png varsa açılacak
+    # st.image("assets/logo.png", width=150)
+    st.title("🚚")
+with col2:
+    st.title("RotaNet")
+    st.caption("AI-Powered Logistics Decision Support Platform")
+
+st.divider()
+
+# Karşılama Mesajı
+if "dataset" not in st.session_state:
+    with st.expander("ℹ️ How to get started?", expanded=True):
+        st.write("""
+        1. **Download** the sample dataset from the sidebar.
+        2. **Upload** your delivery data (CSV/Excel).
+        3. **Set** the number of vehicles.
+        4. **Click** 'Run Optimization' to see the magic!
+        """)
+import streamlit as st
 import sys
 import os
 
