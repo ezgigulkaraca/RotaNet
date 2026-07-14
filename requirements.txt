@@ -4,3 +4,5 @@ numpy
 plotly
 ortools
 openpyxl
+folium
+streamlit-folium
