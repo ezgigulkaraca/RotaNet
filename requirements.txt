@@ -1,8 +1,8 @@
 streamlit
 pandas
-numpy
-plotly
-ortools
 openpyxl
+ortools
+plotly
 folium
 streamlit-folium
+google-generativeai
