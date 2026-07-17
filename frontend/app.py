@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd 
-from backend.ai_service import get_route_insights
+from backend.ai_service import get_ai_insights
 
 # -------------------------------
 # Page Configuration
@@ -169,28 +169,30 @@ with right:
 
             st.warning("Please enter Gemini API Key.")
 
-        elif deliveries is None:
+        elif drivers is None or vehicles is None or deliveries is None:
 
-            st.warning("Please upload datasets.")
+            st.warning("Please upload all three datasets.")
 
         else:
 
-            st.success("Optimization started.")
-            metrics = {
-                "total_distance": 1250
-            }
+            with st.spinner("AI is analyzing logistics operations..."):
 
-            route_summary = """
-            İstanbul → Bursa → İzmir → Ankara
-            """
+                try:
 
-            try:
-                ai_result = get_route_insights(metrics, route_summary)
-                st.markdown(ai_result)
+                    ai_result = get_ai_insights(
+                        api_key,
+                        drivers,
+                        vehicles,
+                        deliveries
+                    )
 
-            except Exception as e:
-                st.error(e)
+                    st.success("Optimization completed.")
 
+                    st.markdown(ai_result)
+
+                except Exception as e:
+
+                    st.error(e)
 
     else:
 
