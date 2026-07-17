@@ -1,5 +1,6 @@
 import streamlit as st
-import pandas as pd
+import pandas as pd 
+from backend.ai_service import get_route_insights
 
 # -------------------------------
 # Page Configuration
@@ -176,16 +177,20 @@ with right:
 
             st.success("Optimization started.")
 
-            st.markdown("""
-### Suggested Plan
+metrics = {
+    "total_distance": 1250
+}
 
-- Best available drivers will be selected.
-- Vehicle capacities will be evaluated.
-- Route optimization will be performed.
-- Fuel estimation will be calculated.
-- CO₂ emission estimation will be generated.
-- AI recommendations will appear here after Gemini integration.
-""")
+route_summary = """
+İstanbul → Bursa → İzmir → Ankara
+"""
+
+try:
+    ai_result = get_route_insights(metrics, route_summary)
+    st.markdown(ai_result)
+
+except Exception as e:
+    st.error(e)
 
     else:
 
