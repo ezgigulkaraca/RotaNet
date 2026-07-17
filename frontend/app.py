@@ -177,19 +177,19 @@ with right:
 
             st.success("Optimization started.")
             metrics = {
-    "total_distance": 1250
-}
+                "total_distance": 1250
+            }
 
-route_summary = """
-İstanbul → Bursa → İzmir → Ankara
-"""
+            route_summary = """
+            İstanbul → Bursa → İzmir → Ankara
+            """
 
-try:
-    ai_result = get_route_insights(metrics, route_summary)
-    st.markdown(ai_result)
+            try:
+                ai_result = get_route_insights(metrics, route_summary)
+                st.markdown(ai_result)
 
-except Exception as e:
-    st.error(e)
+            except Exception as e:
+                st.error(e)
 
 
 try:
