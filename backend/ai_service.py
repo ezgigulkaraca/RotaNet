@@ -2,7 +2,7 @@ import google.generativeai as genai
 import pandas as pd
 
 
-def get_ai_recommendation(api_key, drivers_df, vehicles_df, deliveries_df):
+def get_ai_insights(api_key, drivers_df, vehicles_df, deliveries_df):
 
     genai.configure(api_key=api_key)
 
