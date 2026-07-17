@@ -192,13 +192,6 @@ with right:
                 st.error(e)
 
 
-try:
-    ai_result = get_route_insights(metrics, route_summary)
-    st.markdown(ai_result)
-
-except Exception as e:
-    st.error(e)
-
     else:
 
         st.info("Press 'Start Optimization'.")
