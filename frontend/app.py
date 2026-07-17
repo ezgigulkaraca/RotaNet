@@ -4,7 +4,7 @@ import sys
 import os
 
 # Sistemin backend klasörünü bulabilmesi için yolu ayarlıyoruz
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from ai_engine import get_ai_recommendation
 
 # Şimdi hata almadan içeri aktarabiliriz
 from backend.ai_engine import get_ai_recommendation
