@@ -1,13 +1,7 @@
 import streamlit as st
 import pandas as pd
-import sys
-import os
-
-# Sistemin backend klasörünü bulabilmesi için yolu ayarlıyoruz
+# Dosyalar aynı klasörde olduğu için doğrudan import ediyoruz
 from ai_engine import get_ai_recommendation
-
-# Şimdi hata almadan içeri aktarabiliriz
-from backend.ai_engine import get_ai_recommendation
 
 # Sayfa Yapılandırması
 st.set_page_config(page_title="RotaNet - Akıllı Lojistik", layout="wide")
@@ -40,6 +34,7 @@ if st.button("🚀 Optimizasyonu Başlat"):
     if data is not None and api_key:
         with st.spinner("AI analiz ediyor, adalet puanları hesaplanıyor..."):
             try:
+                # Backend fonksiyonu artık aynı dizinden çağrılıyor
                 result = get_ai_recommendation(api_key, data)
                 st.subheader("🤖 AI Karar Destek Raporu")
                 st.markdown(result)
