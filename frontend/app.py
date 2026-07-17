@@ -20,7 +20,7 @@ with st.sidebar:
     api_key = st.text_input("Gemini API Key", type="password")
     uploaded_file = st.file_uploader("Sefer Verilerini Yükle (Excel/CSV)", type=["xlsx", "csv"])
     num_vehicles = st.number_input("Aktif Araç Sayısı", min_value=1, value=1)
-    # --- Kısım 2: Veri İşleme ---
+# --- Kısım 2: Veri İşleme ---
 data = None
 if uploaded_file is not None:
     try:
