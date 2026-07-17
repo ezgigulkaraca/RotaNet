@@ -1,29 +1,31 @@
 import streamlit as st
-import pandas as pd 
+import pandas as pd
+
 from backend.ai_service import get_ai_insights
 
-# -------------------------------
+# --------------------------------------------------
 # Page Configuration
-# -------------------------------
+# --------------------------------------------------
 
 st.set_page_config(
     page_title="RotaNet",
     page_icon="🚛",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
 
-# -------------------------------
+# --------------------------------------------------
 # Header
-# -------------------------------
+# --------------------------------------------------
 
 st.title("RotaNet")
 st.caption("AI-Powered Logistics Operations Decision Support Platform")
 
 st.divider()
 
-# -------------------------------
+# --------------------------------------------------
 # Sidebar
-# -------------------------------
+# --------------------------------------------------
 
 with st.sidebar:
 
@@ -33,7 +35,8 @@ with st.sidebar:
 
     api_key = st.text_input(
         "Gemini API Key",
-        type="password"
+        type="password",
+        placeholder="Paste your Gemini API Key"
     )
 
     st.divider()
@@ -62,48 +65,39 @@ with st.sidebar:
         use_container_width=True
     )
 
-# -------------------------------
+# --------------------------------------------------
 # Dataset Loading
-# -------------------------------
+# --------------------------------------------------
 
-drivers = None
-vehicles = None
-deliveries = None
+def load_dataset(uploaded_file):
 
-try:
+    if uploaded_file is None:
+        return None
 
-    if drivers_file is not None:
+    if uploaded_file.name.endswith(".csv"):
+        return pd.read_csv(uploaded_file)
 
-        if drivers_file.name.endswith(".csv"):
-            drivers = pd.read_csv(drivers_file)
-        else:
-            drivers = pd.read_excel(drivers_file)
+    return pd.read_excel(uploaded_file)
 
-    if vehicles_file is not None:
 
-        if vehicles_file.name.endswith(".csv"):
-            vehicles = pd.read_csv(vehicles_file)
-        else:
-            vehicles = pd.read_excel(vehicles_file)
+drivers = load_dataset(drivers_file)
+vehicles = load_dataset(vehicles_file)
+deliveries = load_dataset(deliveries_file)
 
-    if deliveries_file is not None:
-
-        if deliveries_file.name.endswith(".csv"):
-            deliveries = pd.read_csv(deliveries_file)
-        else:
-            deliveries = pd.read_excel(deliveries_file)
-
-except Exception as e:
-
-    st.error(e)
-
-# -------------------------------
-# KPI
-# -------------------------------
+# --------------------------------------------------
+# KPI Cards
+# --------------------------------------------------
 
 driver_count = len(drivers) if drivers is not None else 0
 vehicle_count = len(vehicles) if vehicles is not None else 0
 delivery_count = len(deliveries) if deliveries is not None else 0
+
+total_weight = 0
+
+if deliveries is not None:
+
+    if "Weight" in deliveries.columns:
+        total_weight = deliveries["Weight"].sum()
 
 col1, col2, col3, col4 = st.columns(4)
 
@@ -117,47 +111,38 @@ with col3:
     st.metric("Deliveries", delivery_count)
 
 with col4:
-
-    if deliveries is not None and "Weight" in deliveries.columns:
-        total_weight = deliveries["Weight"].sum()
-    else:
-        total_weight = 0
-
     st.metric("Total Weight (kg)", total_weight)
 
 st.divider()
 
-# -------------------------------
-# Layout
-# -------------------------------
+# --------------------------------------------------
+# Main Layout
+# --------------------------------------------------
 
-left, right = st.columns([2,1])
+left, right = st.columns([2, 1])
 
-# -------------------------------
-# Left Side
-# -------------------------------
+# --------------------------------------------------
+# LEFT PANEL
+# --------------------------------------------------
 
 with left:
 
-    st.subheader("Optimization Results")
+    st.subheader("Delivery Dataset")
 
     if deliveries is not None:
-
-        st.dataframe(deliveries)
+        st.dataframe(deliveries, use_container_width=True)
 
     else:
-
-        st.info("Upload delivery dataset.")
+        st.info("Upload Deliveries Dataset to continue.")
 
     st.divider()
 
     st.subheader("Interactive Map")
 
-    st.info("Route map will be displayed here.")
-
-# -------------------------------
-# Right Side
-# -------------------------------
+    st.info("Map integration will be added in the next version.")
+    # --------------------------------------------------
+# RIGHT PANEL
+# --------------------------------------------------
 
 with right:
 
@@ -166,12 +151,10 @@ with right:
     if optimize_button:
 
         if api_key == "":
-
-            st.warning("Please enter Gemini API Key.")
+            st.warning("Please enter your Gemini API Key.")
 
         elif drivers is None or vehicles is None or deliveries is None:
-
-            st.warning("Please upload all three datasets.")
+            st.warning("Please upload Drivers, Vehicles and Deliveries datasets.")
 
         else:
 
@@ -186,32 +169,40 @@ with right:
                         deliveries
                     )
 
-                    st.success("Optimization completed.")
+                    st.success("Optimization completed successfully.")
 
                     st.markdown(ai_result)
 
                 except Exception as e:
 
-                    st.error(e)
+                    st.error(f"AI Error: {e}")
 
     else:
 
-        st.info("Press 'Start Optimization'.")
+        st.info("Press 'Start Optimization' to generate an AI operation plan.")
 
     st.divider()
 
     st.subheader("Operational Summary")
 
-    st.write(f"Drivers : **{driver_count}**")
+    st.write(f"Drivers: **{driver_count}**")
+    st.write(f"Vehicles: **{vehicle_count}**")
+    st.write(f"Deliveries: **{delivery_count}**")
+    st.write(f"Total Weight: **{total_weight} kg**")
 
-    st.write(f"Vehicles : **{vehicle_count}**")
+    st.write("---")
 
-    st.write(f"Deliveries : **{delivery_count}**")
+    st.metric("Fleet Utilization", "-- %")
+    st.metric("Estimated Fuel", "-- L")
+    st.metric("Estimated Cost", "-- ₺")
+    st.metric("Estimated CO₂", "-- kg")
 
-    st.write("Fleet Utilization : -- %")
+st.divider()
 
-    st.write("Estimated Cost : --")
+# --------------------------------------------------
+# FOOTER
+# --------------------------------------------------
 
-    st.write("Estimated Fuel : --")
-
-    st.write("Estimated CO₂ : --")
+st.caption(
+    "RotaNet | AI-Powered Logistics Operations Decision Support Platform"
+)
