@@ -1,111 +1,210 @@
 import streamlit as st
 import pandas as pd
 
-from ai_engine import get_ai_recommendation
-
-# --------------------------------------------------
+# -------------------------------
 # Page Configuration
-# --------------------------------------------------
+# -------------------------------
 
 st.set_page_config(
     page_title="RotaNet",
     page_icon="🚛",
-    layout="wide",
-    initial_sidebar_state="expanded"
+    layout="wide"
 )
 
-# --------------------------------------------------
+# -------------------------------
 # Header
-# --------------------------------------------------
+# -------------------------------
 
 st.title("RotaNet")
 st.caption("AI-Powered Logistics Operations Decision Support Platform")
 
 st.divider()
-# --------------------------------------------------
+
+# -------------------------------
 # Sidebar
-# --------------------------------------------------
+# -------------------------------
 
 with st.sidebar:
 
     st.header("Operations Panel")
 
-    st.markdown("### AI Configuration")
+    st.subheader("AI Configuration")
 
     api_key = st.text_input(
         "Gemini API Key",
-        type="password",
-        placeholder="Enter your Gemini API Key"
+        type="password"
     )
 
     st.divider()
 
-    st.markdown("### Dataset")
+    st.subheader("Datasets")
 
-    uploaded_file = st.file_uploader(
-        "Upload Drivers / Vehicles / Deliveries",
+    drivers_file = st.file_uploader(
+        "Drivers Dataset",
+        type=["csv", "xlsx"]
+    )
+
+    vehicles_file = st.file_uploader(
+        "Vehicles Dataset",
+        type=["csv", "xlsx"]
+    )
+
+    deliveries_file = st.file_uploader(
+        "Deliveries Dataset",
         type=["csv", "xlsx"]
     )
 
     st.divider()
 
-    st.markdown("### Optimization Settings")
-
-    num_vehicles = st.number_input(
-        "Available Vehicles",
-        min_value=1,
-        value=3,
-        step=1
-    )
-
-    optimize = st.button(
+    optimize_button = st.button(
         "Start Optimization",
         use_container_width=True
     )
-    # --------------------------------------------------
-# Main Dashboard
-# --------------------------------------------------
 
-st.subheader("Operations Dashboard")
+# -------------------------------
+# Dataset Loading
+# -------------------------------
+
+drivers = None
+vehicles = None
+deliveries = None
+
+try:
+
+    if drivers_file is not None:
+
+        if drivers_file.name.endswith(".csv"):
+            drivers = pd.read_csv(drivers_file)
+        else:
+            drivers = pd.read_excel(drivers_file)
+
+    if vehicles_file is not None:
+
+        if vehicles_file.name.endswith(".csv"):
+            vehicles = pd.read_csv(vehicles_file)
+        else:
+            vehicles = pd.read_excel(vehicles_file)
+
+    if deliveries_file is not None:
+
+        if deliveries_file.name.endswith(".csv"):
+            deliveries = pd.read_csv(deliveries_file)
+        else:
+            deliveries = pd.read_excel(deliveries_file)
+
+except Exception as e:
+
+    st.error(e)
+
+# -------------------------------
+# KPI
+# -------------------------------
+
+driver_count = len(drivers) if drivers is not None else 0
+vehicle_count = len(vehicles) if vehicles is not None else 0
+delivery_count = len(deliveries) if deliveries is not None else 0
 
 col1, col2, col3, col4 = st.columns(4)
 
 with col1:
-    st.metric("Drivers", "--")
+    st.metric("Drivers", driver_count)
 
 with col2:
-    st.metric("Vehicles", "--")
+    st.metric("Vehicles", vehicle_count)
 
 with col3:
-    st.metric("Deliveries", "--")
+    st.metric("Deliveries", delivery_count)
 
 with col4:
-    st.metric("Estimated Cost", "--")
+
+    if deliveries is not None and "Weight" in deliveries.columns:
+        total_weight = deliveries["Weight"].sum()
+    else:
+        total_weight = 0
+
+    st.metric("Total Weight (kg)", total_weight)
 
 st.divider()
 
-left_col, right_col = st.columns([2, 1])
-with left_col:
+# -------------------------------
+# Layout
+# -------------------------------
+
+left, right = st.columns([2,1])
+
+# -------------------------------
+# Left Side
+# -------------------------------
+
+with left:
 
     st.subheader("Optimization Results")
 
-    result_placeholder = st.empty()
+    if deliveries is not None:
 
-    st.info("Optimization results will be displayed here.")
+        st.dataframe(deliveries)
 
-    st.subheader("Interactive Route Map")
+    else:
 
-    map_placeholder = st.empty()
+        st.info("Upload delivery dataset.")
 
-    st.info("Route visualization will appear here.")
-    with right_col:
+    st.divider()
+
+    st.subheader("Interactive Map")
+
+    st.info("Route map will be displayed here.")
+
+# -------------------------------
+# Right Side
+# -------------------------------
+
+with right:
 
     st.subheader("AI Insights")
 
-    ai_placeholder = st.empty()
+    if optimize_button:
 
-    st.info("AI recommendations will appear here.")
+        if api_key == "":
+
+            st.warning("Please enter Gemini API Key.")
+
+        elif deliveries is None:
+
+            st.warning("Please upload datasets.")
+
+        else:
+
+            st.success("Optimization started.")
+
+            st.markdown("""
+### Suggested Plan
+
+- Best available drivers will be selected.
+- Vehicle capacities will be evaluated.
+- Route optimization will be performed.
+- Fuel estimation will be calculated.
+- CO₂ emission estimation will be generated.
+- AI recommendations will appear here after Gemini integration.
+""")
+
+    else:
+
+        st.info("Press 'Start Optimization'.")
+
+    st.divider()
 
     st.subheader("Operational Summary")
 
-    st.info("Fleet utilization and operational metrics will appear here.")
+    st.write(f"Drivers : **{driver_count}**")
+
+    st.write(f"Vehicles : **{vehicle_count}**")
+
+    st.write(f"Deliveries : **{delivery_count}**")
+
+    st.write("Fleet Utilization : -- %")
+
+    st.write("Estimated Cost : --")
+
+    st.write("Estimated Fuel : --")
+
+    st.write("Estimated CO₂ : --")
